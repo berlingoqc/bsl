@@ -134,20 +134,33 @@ struct VFileInfo {
 
 };
 
-class VDirectoryInfo : public VList<VFileInfo> {
+class VDirectoryInfo {
 
 public:
-	VDirectoryInfo(int size) : VList<VFileInfo>(size) {
+	std::vector<VFileInfo>		_list;
+	std::vector<VPath>			_directory;
 
-	}
+	VDirectoryInfo() = default;
 
-	int	GetTotalSize() const {
+	int	GetTotalFileSize() const {
 
 		return 0;
 	}
 
-	const VFileInfo&	GetFileInfo(int index);
-	const VFileInfo&	GetFileInfo(VPath path);
+	int GetNumberFile() const {
+
+	}
+
+	int GetNumberDirectory() const {
+
+	}
+
+	const VFileInfo&	GetFileInfo(int index) {
+
+	}
+	const VFileInfo&	GetFileInfo(VPath path) {
+
+	}
 };
 
 class VFS {
@@ -156,7 +169,8 @@ public:
 	// Retourne une struture d'information sur un fichier
 	virtual VFileInfo					GetFileInfo(const VPath& path,VFileEx& ex) = 0;
 	// Retourne la liste des fichiers dans un repertoire
-	virtual std::vector<VFileInfo>		GetFilesInfoDirectory(const VPath& path,VFileEx& ex) = 0;
+	virtual VDirectoryInfo				GetFilesInfoDirectory(const VPath& path,VFileEx& ex) = 0;
+	virtual std::future<VDirectoryInfo> GetFilesInfoDirectoryAsync(const VPath& path,VFileEx& ex) =0;
 	// Retourne le contenue d'un fichier de facon synchrone
 	virtual VData						ReadFile(const VFileInfo& file,VFileEx& ex) = 0;
 	// Retourne le contenue d'une fichier de facon synchrone
@@ -184,8 +198,9 @@ public:
 
 	LocalFS(fs::path root,VFileEx& ex);
 
-	VFileInfo GetFileInfo(const VPath& path,VFileEx& ex) override;
-	std::vector<VFileInfo>		GetFilesInfoDirectory(const VPath& path,VFileEx& ex) override;
+	VFileInfo 					GetFileInfo(const VPath& path,VFileEx& ex) override;
+	VDirectoryInfo				GetFilesInfoDirectory(const VPath& path,VFileEx& ex) override;
+	std::future<VDirectoryInfo> GetFilesInfoDirectoryAsync(const VPath& path,VFileEx& ex) override;
 	VData						ReadFile(const VFileInfo& file,VFileEx& ex) override;
 	std::future<VData> 			GetFileDataAsync(const VFileInfo& p,VFileEx& ex) override;
 	bool Exists(const VPath& p) override;

@@ -22,7 +22,7 @@ bool TestLocalVFS(std::string root_path) {
     }
     VPath vp;
     vp.append("");
-    for( const auto& i : localfs.GetFilesInfoDirectory(vp,ex)) {
+    for( const auto& i : localfs.GetFilesInfoDirectory(vp,ex)._list) {
         printf("Info file %s size %d\n",localfs.toString(i.getPath()).c_str(),i.getSize());
     }
     return true;

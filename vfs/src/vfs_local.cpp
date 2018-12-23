@@ -35,21 +35,26 @@ VFileInfo LocalFS::GetFileInfo(const VPath& path,VFileEx& ex) {
     return VFileInfo();
 }
 
-std::vector<VFileInfo> LocalFS::GetFilesInfoDirectory(const VPath& path,VFileEx& ex) {
+VDirectoryInfo LocalFS::GetFilesInfoDirectory(const VPath& path,VFileEx& ex) {
     fs::path p = _root / toString(path);
-    std::vector<VFileInfo> files;
+    VDirectoryInfo dir_info;
     std::error_code ec;
     for(const auto& i : fs::directory_iterator(p)) {
         if(fs::is_regular_file(i,ec)) {
             VPath vp = toVPath(i.path());
             std::error_code e;
             int size = fs::file_size(i.path(),e);
-            files.emplace_back(VFileInfo(vp,size));
+            dir_info._list.emplace_back(VFileInfo(vp,size));
         }
     }
-    return files;
+    return dir_info;
 }
 
+std::future<VDirectoryInfo> LocalFS::GetFilesInfoDirectoryAsync(const VPath& path,VFileEx& ex) {
+    return std::async(std::launch::async,[&]()->VDirectoryInfo{
+        return GetFilesInfoDirectory(path,ex);
+    });
+}
 VData LocalFS::ReadFile(const VFileInfo& file,VFileEx& ex) {
     fs::path p = _root / toString(file.getPath());
     if(!fs::exists(p)) {
